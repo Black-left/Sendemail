@@ -1,3 +1,6 @@
+<form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+
+
 <?php
 /**
  * Created by PhpStorm.
@@ -7,10 +10,31 @@
  */
 $dbc = mysqli_connect('localhost','root','','elvis_store')
     or die('连接数据库错误');
-$email = $_POST['email'];
 
-$query = "DELETE FROM email_list WHERE email = '$email'";
-mysqli_query($dbc,$query) or die('sql命令执行错误');
+if(isset($_POST['submit'])){
+    foreach ($_POST['todelete'] as $delete_id){
+        $query = "DELETE FROM email_list WHERE id = $delete_id";
+        mysqli_query($dbc,$query) or die('Error querying database');
+    }
+    echo 'Customer removed.';
+    echo '<br>';
+}
 
-echo '邮箱:'.$email.'已移除';
+
+$query = "SELECT * FROM email_list";
+$result = mysqli_query($dbc,$query);
+
+while($row = mysqli_fetch_array($result)){
+    echo '<input type="checkbox" value="'.$row['id'].'" name = "todelete[]" />';
+    echo $row['first_name'];
+    echo ' '.$row['last_name'].' ';
+    echo $row['email'];
+    echo '<br>';
+}
 mysqli_close($dbc);
+
+
+
+?>
+    <input type="submit" name="submit" value="Remove">
+</form>
